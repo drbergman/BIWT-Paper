@@ -27,42 +27,58 @@ If using macOS or Linux, run the project with:
 
 ## Automated running with Julia and pcvct
 To run all 9 simulations in an automated manner, you can use the [pcvct.jl](https://github.com/drbergman/pcvct) package.
-Follow the steps in the [documentation](https://drbergman.github.io/pcvct/stable/man/getting_started/) to get set up with Julia and pcvct.
-In particular, once you have a pcvct project set up and have run `initializeModelManager()` on the project, you can call `importProject("./path/to/user_projects/well-mixed-1")`, for example, to import the project.
-Note the terminal output that will show the location of the imported folders.
-Then, using the `VCT/GenerateData.jl` script, you can change the folders to point to the newly-imported folders:
-```julia
-using pcvct
 
-@assert isdir("data") && isdir("PhysiCell") && isdir("VCT") "Make sure you are in the right directory to intialize the model manager"
-initializeModelManager()
+### Install Julia and pcvct
+Follow the (three!) steps in the [documentation](https://drbergman.github.io/pcvct/stable/man/getting_started/) to get install Julia and pcvct.
+1. Install Julia (curl -fsSL https://install.julialang.org)
+2. Add the PCVCTRegistry (`] registry add https://github.com/drbergman/PCVCTRegistry`)
+3. Add the pcvct package (`] add pcvct`)
 
-# importProject(joinpath("path", "to", "user_projects", "well-mixed-1")) # only needed once
-
-config_folder = custom_code_folder = rules_folder = ic_cell_folder = "well-mixed-1" # they should all go in folders with this name for the well-mixed-1 project
-
-inputs = InputFolders(config_folder, custom_code_folder;
-    rulesets_collection=rules_folder,
-    ic_cell=ic_cell_folder)
-
-out = run(inputs) # will run one replicate
+### Create a pcvct project
+After installing pcvct, create a pcvct project (if you didn't get there in the setup guide).
+First, launch Julia from the terminal:
+```sh
+julia
+```
+Then, in the Julia REPL, run:
+```julia-repl
+julia> using pcvct
+julia> createProject() # this will use the current directory as the project directory
+julia> # createProject("path/to/pcvct_project") # this will create a new project in the specified directory
 ```
 
-You can also easily run all 9 simulations at once:
+### Import the PhysiCell projects
+Change directory into the pcvct project you just created.
+If still in the Julia REPL, you can enter `;` to enter shell mode and then `cd` to change directories as you would in a terminal.
+Be sure to return to the Julian mode by entering `delete` or `backspace`.
+
+Now that you are in the pcvct project directory, you can import the PhysiCell projects.
+Within Julia, you can run the following commands to import the projects.
+Replace `joinpath("path", "to", "user_projects", project)` with the path to the project you want to import either relative to the current directory or the absolute path.
+```julia-repl
+julia> using pcvct
+julia> @assert isdir("data") && isdir("PhysiCell") && isdir("VCT") "Make sure you are in the right directory to intialize the model manager"
+julia> initializeModelManager()
+julia> projects = ["well-mixed-1", "well-mixed-2", "well-mixed-3", "structured-1", "structured-2", "structured-3", "spatial-informed"]
+julia> path_to_projects = [joinpath("path", "to", "user_projects", project) for project in projects]
+julia> importProject.(path_to_projects) # import them all in one line (only needed once; will create duplicate folders to safely import)
+```
+If you want to import a single project, you can run:
+```julia-repl
+julia> importProject(joinpath("path", "to", "user_projects", "well-mixed-1"))
+```
+
+### Run the simulations
+You can now run the simulations with the following script either running in the REPL or launching with a script as `julia script_name.jl`.
 ```julia
 using pcvct
-
 @assert isdir("data") && isdir("PhysiCell") && isdir("VCT") "Make sure you are in the right directory to intialize the model manager"
 initializeModelManager()
 
 projects = ["well-mixed-1", "well-mixed-2", "well-mixed-3", "structured-1", "structured-2", "structured-3", "spatial-informed"] # to best match the results of the paper, it may be better to only use one each of the mixed and structured projects
-# path_to_projects = [joinpath("path", "to", "user_projects", project) for project in projects]
-# importProject.(path_to_projects) # import them all in one line (only needed once; will create duplicate folders to safely import)
-
 inputss = [InputFolders(project, project;
     rulesets_collection=project,
     ic_cell=project) for project in projects]
-
 monads = [createTrial(inputs; n_replicates=3) for inputs in inputss] # will prepare a "monad" for each, which just means a collection of replicates (3 in this case)
 trial = Trial(monads) # bundle them all into a single Trial object
 out = run(trial) # will run all replicates (21 in this case since each of the 6 random initializations has 3 replicates)
