@@ -1,0 +1,27 @@
+// XML Rules Export
+// cell_type,signal,response,behavior,max_response,half_max,hill_power,applies_to_dead
+
+// cancer
+//   cycle entry
+//     decreasing to 0.0
+cancer,pressure,decreases,cycle entry,0.0,0.5,8,0
+
+
+//   apoptosis
+//     increasing to 1.0
+cancer,damage,increases,apoptosis,1.0,30,10,0
+
+
+//   debris secretion
+//     increasing to 1.0
+cancer,dead,increases,debris secretion,1.0,1e-10,1,1
+
+
+
+// cd8
+//   migration bias
+//     increasing to 0.5
+cd8,debris gradient,increases,migration bias,0.5,1e-3,2,0
+
+
+
