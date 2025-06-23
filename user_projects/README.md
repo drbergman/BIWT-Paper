@@ -25,14 +25,16 @@ If using macOS or Linux, run the project with:
 ./project
 ```
 
+View results using [PhysiCell-Studio](https://github.com/PhysiCell-Tools/PhysiCell-Studio).
+
 ## Automated running with Julia and pcvct
 To run all 9 simulations in an automated manner, you can use the [pcvct.jl](https://github.com/drbergman/pcvct) package.
 
 ### Install Julia and pcvct
 Follow the (three!) steps in the [documentation](https://drbergman.github.io/pcvct/stable/man/getting_started/) to get install Julia and pcvct.
-1. Install Julia (curl -fsSL https://install.julialang.org)
-2. Add the PCVCTRegistry (`] registry add https://github.com/drbergman/PCVCTRegistry`)
-3. Add the pcvct package (`] add pcvct`)
+1. [Install Julia](https://julialang.org/install/)
+2. Add the PCVCTRegistry: `] registry add https://github.com/drbergman/PCVCTRegistry`
+3. Add the pcvct package: `] add pcvct`
 
 ### Create a pcvct project
 After installing pcvct, create a pcvct project (if you didn't get there in the setup guide).
@@ -83,3 +85,6 @@ monads = [createTrial(inputs; n_replicates=3) for inputs in inputss] # will prep
 trial = Trial(monads) # bundle them all into a single Trial object
 out = run(trial) # will run all replicates (21 in this case since each of the 6 random initializations has 3 replicates)
 ```
+
+If [PhysiCell-Studio](https://github.com/PhysiCell-Tools/PhysiCell-Studio) is installed, it can be set up to view these results.
+See the [pcvct documentation](https://drbergman.github.io/pcvct/stable/man/physicell_studio/).
